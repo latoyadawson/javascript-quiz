@@ -3,9 +3,12 @@ var startButtonEl = document.querySelector('#start');
 var questionEl = document.querySelector('#question');
 var answerEl = document.querySelector('#answers');
 var startPageEl =  document.querySelector('#startpage');
+var scorePageEl = document.querySelector('#score');
 var questionConEl = document.querySelector('#questionsContainer');
-var correctEl = document.querySelector('#prompt')
+var correctEl = document.querySelector('#prompt');
 var countdownEl = document.querySelector('#countdown');
+var scoreAreaEl = document.querySelector('#scoreArea');
+var inNameEl = document.querySelector('#inName');
 
 //variables 
 var timer = 75;
@@ -85,10 +88,10 @@ function answerButton (answer) {
     buttonEl.id = answer.text;
     buttonEl.innerText = answer.text;
   
+    //even listern for going to next question once the answer of a button is clicked
     buttonEl.addEventListener("click", nextQuestion);
-
+    
     answerEl.appendChild(buttonEl);
- 
 }
 
 
@@ -101,11 +104,14 @@ function nextQuestion (event) {
 
     deleteButton();
     questionIndex++;
-    showQAs();
-
-    
+    if (questionIndex < questions.length) {
+        showQAs();
+    } else {
+        gameOver();
+    }
 }
 
+//deletes the answer buttons so next answers can be displayed
 function deleteButton (){
     //loops through the answers array and deletes button
     for (var i = 0; i< questions[questionIndex].answers.length; i++) {
@@ -113,19 +119,17 @@ function deleteButton (){
         buttonId.remove(); 
     }  
     
-
 }
 
-//prompt for if question is correct 
+//adjusting time and points based on if answer is correct or wrong 
 function correctInc (answer) {
     createText(answer);
-    if (answer === true){
+    if (answer === "true"){
         score += 5;
     } else {
         timer -= 10;
     }
 }
-
 
 //function for creating a text for correct and wrong answer's
 function createText(answer) {
@@ -136,49 +140,71 @@ function createText(answer) {
     }
 }
 
-
-
-
 // timer function starts at 75 seconds
 function startTimer() {
-    countdown.innerHTML = "Time:" + timer;
+    countdownEl.innerHTML = "Time:" + timer;
     if (timer <= 0) {
-        console.log("over");
+        gameOver();
     } else {
         timer -= 1;
-        runningTimer = setTimeout(startTimer, 2000);
+        runningTimer = setTimeout(startTimer, 1000);
     }
 
 }
 // game over function
-
 function gameOver() {
     clearInterval(runningTimer);
-    countdown.innerHTML = "Finished";
-    startButtonEl.innerText = "Restart";
-    timer = 75;
-    score = 0;
-      
+    countdownEl.innerHTML = "Finished";
+    displayScore();
+    localStorage.setItem("score", JSON.stringify(score));
 }
 
-   
-// for every wrong answer take away ten seconds 
-
-
-//for every correct answer save 5 points 
-
-
-
-
-
-// on click of a li answer, go to the next questions 
-
-
 // once all questions have been answered give me a final score 
+function displayScore () {
+    questionConEl.replaceWith(scorePageEl);
+    scoreAreaEl.innerText = "Final Score:" + score;
+     // Create an input element for initials 
+    initTextEl = document.createElement("input"); 
+    initTextEl.setAttribute("type", "text"); 
+    initTextEl.setAttribute("name", "iniatials"); 
+    initTextEl.setAttribute("placeholder", "Enter Initials here"); 
+      
+    inNameEl.appendChild(initTextEl);
 
+    saveButtonEl = document.createElement("button");
+    saveButtonEl.setAttribute("id" , "save-btn");
+    saveButtonEl.setAttribute("class" ,"save-btn");
+    saveButtonEl.setAttribute("text" , "Save Score");
+    saveButtonEl.setAttribute("type" , "submit");
 
+    inNameEl.appendChild(saveButtonEl);
+}
+
+//gets tasks from local storage 
+var loadScore = function loadScore (){
+    // get tasks items from local stroage
+    var savedScore = localStorage.getItem(score);
+
+    //if (!savedScore) {
+      //  return false;
+    //}
+    //Converts tasks from the string format back into an array of objects.
+    //savedTasks = JSON.parse(savedTasks);
+
+    //loops through savedTasks array
+    //for (var i = 0; i < savedTasks.length; i++) {
+        // pass each task object into the `createTaskEl()` function
+        //createTaskEl(savedTasks[i]);
+    //}
+}
 //allow me to put in my intials to save my final score 
 
+
+
+
+
+
+//event listeners
 startButtonEl.addEventListener("click", startQuiz);
 
 
