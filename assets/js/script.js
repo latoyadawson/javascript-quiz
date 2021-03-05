@@ -9,12 +9,13 @@ var correctEl = document.querySelector('#prompt');
 var countdownEl = document.querySelector('#countdown');
 var scoreAreaEl = document.querySelector('#scoreArea');
 var inNameEl = document.querySelector('#inName');
+var buttonDivEl = document.querySelector('#saveButton');
+var highScoreEl = document.querySelector('#highScores')
 
 //variables 
 var timer = 75;
 var runningTimer;
 var score = 0;
-var intials = "";
 var questionIndex = 0
 
 //questions array
@@ -88,7 +89,7 @@ function answerButton (answer) {
     buttonEl.id = answer.text;
     buttonEl.innerText = answer.text;
   
-    //even listern for going to next question once the answer of a button is clicked
+    //eveny listern for going to next question once the answer of a button is clicked
     buttonEl.addEventListener("click", nextQuestion);
     
     answerEl.appendChild(buttonEl);
@@ -156,7 +157,7 @@ function gameOver() {
     clearInterval(runningTimer);
     countdownEl.innerHTML = "Finished";
     displayScore();
-    localStorage.setItem("score", JSON.stringify(score));
+    savedScore ();
 }
 
 // once all questions have been answered give me a final score 
@@ -165,49 +166,64 @@ function displayScore () {
     scoreAreaEl.innerText = "Final Score:" + score;
      // Create an input element for initials 
     initTextEl = document.createElement("input"); 
+    initTextEl.setAttribute("id", "initails-input"); 
     initTextEl.setAttribute("type", "text"); 
     initTextEl.setAttribute("name", "iniatials"); 
     initTextEl.setAttribute("placeholder", "Enter Initials here"); 
       
     inNameEl.appendChild(initTextEl);
 
+
+    // create save button elemetn
     saveButtonEl = document.createElement("button");
     saveButtonEl.setAttribute("id" , "save-btn");
     saveButtonEl.setAttribute("class" ,"save-btn");
-    saveButtonEl.setAttribute("text" , "Save Score");
     saveButtonEl.setAttribute("type" , "submit");
+    saveButtonEl.textContent = "Save Score";
 
     inNameEl.appendChild(saveButtonEl);
+
+    inNameEl.addEventListener("submit", viewHighScores);
 }
 
-//gets tasks from local storage 
-var loadScore = function loadScore (){
+function viewHighScores (e) { 
+  e.preventDefault();
+    var name = document.querySelector("#initails-input").value;
+    savedInit(name);
+
+    //scorePageEl.replaceWith(highScoreEl)
+    loadSaveScores();
+    
+  
+}
+
+
+//function to save task in local storage 
+var savedScore = function() {
+    localStorage.setItem("score", JSON.stringify(score));
+}
+var savedInit = function(initails) {
+    localStorage.setItem("initails", JSON.stringify(initails));
+}
+
+// gets tasks from local storage and load them
+function loadSaveScores() {
     // get tasks items from local stroage
-    var savedScore = localStorage.getItem(score);
+    var savedScore = localStorage.getItem("score");
+    var savedInit = localStorage.getItem("initails");
 
-    //if (!savedScore) {
-      //  return false;
-    //}
-    //Converts tasks from the string format back into an array of objects.
-    //savedTasks = JSON.parse(savedTasks);
+    savedScore  = JSON.parse(savedScore);
+    savedInit = JSON.parse(savedInit);
 
-    //loops through savedTasks array
-    //for (var i = 0; i < savedTasks.length; i++) {
-        // pass each task object into the `createTaskEl()` function
-        //createTaskEl(savedTasks[i]);
-    //}
-}
-//allow me to put in my intials to save my final score 
+    document.getElementById("highScores").innerHTML = savedInit + " - " + savedScore;
+   
+}   
 
+/*function submitScores (e) {
+    e.preventDefault();
 
-
-
+}*/
 
 
 //event listeners
 startButtonEl.addEventListener("click", startQuiz);
-
-
-
-
-
