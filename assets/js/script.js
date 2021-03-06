@@ -10,7 +10,7 @@ var countdownEl = document.querySelector('#countdown');
 var scoreAreaEl = document.querySelector('#scoreArea');
 var inNameEl = document.querySelector('#inName');
 var buttonDivEl = document.querySelector('#saveButton');
-var highScoreEl = document.querySelector('#highScores')
+var highScoreEl = document.getElementById('highScores');
 
 //variables 
 var timer = 75;
@@ -62,30 +62,11 @@ var questions = [
     }
 ];
 
-// start quiz on click  
-function startQuiz() {
-    startPageEl.replaceWith(questionConEl)
-    startTimer();
-    showQAs();
-}
-
-//show questions 
-function showQAs (){
-    questionEl.innerHTML=questions[questionIndex].question
-   // loop for answers in questions
-    //answerEl.innerHTML = "<ol>";
-    
-    for (var i = 0; i< questions[questionIndex].answers.length; i++) {
-       answerButton(questions[questionIndex].answers[i]); 
-    }    
-
-    //answerEl.innerHTML += "</ol>";
-}
-
-// make answers into a buton  
+// make answer text into a buttons  
 function answerButton (answer) {
     var buttonEl = document.createElement('button');
     buttonEl.setAttribute('answer', answer.correct);
+    buttonEl.setAttribute('class' , 'answer-button' )
     buttonEl.id = answer.text;
     buttonEl.innerText = answer.text;
   
@@ -93,23 +74,6 @@ function answerButton (answer) {
     buttonEl.addEventListener("click", nextQuestion);
     
     answerEl.appendChild(buttonEl);
-}
-
-
-//looping through questionIndex
-function nextQuestion (event) {
-    console.log(nextQuestion);
-    var targetEl = event.target;
-    
-    correctInc(targetEl.getAttribute('answer'));
-
-    deleteButton();
-    questionIndex++;
-    if (questionIndex < questions.length) {
-        showQAs();
-    } else {
-        gameOver();
-    }
 }
 
 //deletes the answer buttons so next answers can be displayed
@@ -123,6 +87,7 @@ function deleteButton (){
 }
 
 //adjusting time and points based on if answer is correct or wrong 
+//var correctInc = function (answer){}
 function correctInc (answer) {
     createText(answer);
     if (answer === "true"){
@@ -133,6 +98,7 @@ function correctInc (answer) {
 }
 
 //function for creating a text for correct and wrong answer's
+//var createText = function(answer){}
 function createText(answer) {
     if (answer === "true") {
         correctEl.innerHTML = "Correct!"
@@ -142,6 +108,7 @@ function createText(answer) {
 }
 
 // timer function starts at 75 seconds
+//var startTimer = function ()
 function startTimer() {
     countdownEl.innerHTML = "Time:" + timer;
     if (timer <= 0) {
@@ -152,21 +119,56 @@ function startTimer() {
     }
 
 }
-// game over function
-function gameOver() {
-    clearInterval(runningTimer);
-    countdownEl.innerHTML = "Finished";
-    displayScore();
-    savedScore ();
+
+
+// gets items from local storage and load them
+//var loadSavedScores = function (){}
+function loadSavedScores() {
+
+    var currentleaderboard = JSON.parse(localStorage.getItem("leaderboard"));
+   
+
+    //loop through the leaderboard create new DOM elements
+    for (var i = 0; i<currentleaderboard.length; i++) {
+        var p = document.createElement("p")
+        p.setAttribute("class", "user-score")
+        p.innerHTML = currentleaderboard[i].initails + " - " + currentleaderboard[i].score;
+        highScoreEl.appendChild(p);
+    }
+
+   
+}   
+
+function viewHighScores() { 
+    scorePageEl.replaceWith(highScoreEl);
+    loadSavedScores();
+}
+  
+  
+//save name and initail to local stroage 
+// var saveScoresLocalstorage = function (){}
+function saveScoresLocalStorage(e) {
+    e.preventDefault();
+    var name = document.querySelector("#initails-input").value;
+    var userScore = {initails: name , score};
+    // get the current local storage array
+    var leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
+    // push userscore variables into leaderboard array 
+    leaderboard.push(userScore);
+    //setting back to array and local storage item
+    localStorage.setItem("leaderboard", JSON.stringify(leaderboard));
+    viewHighScores();
 }
 
 // once all questions have been answered give me a final score 
-function displayScore () {
+//var displayScore = function () {}
+function displayScore() {
     questionConEl.replaceWith(scorePageEl);
-    scoreAreaEl.innerText = "Final Score:" + score;
+    scoreAreaEl.innerText = "Final Score: " + score;
      // Create an input element for initials 
     initTextEl = document.createElement("input"); 
     initTextEl.setAttribute("id", "initails-input"); 
+    initTextEl.setAttribute("class","initails-input");
     initTextEl.setAttribute("type", "text"); 
     initTextEl.setAttribute("name", "iniatials"); 
     initTextEl.setAttribute("placeholder", "Enter Initials here"); 
@@ -182,19 +184,10 @@ function displayScore () {
     saveButtonEl.textContent = "Save Score";
 
     inNameEl.appendChild(saveButtonEl);
-
-    inNameEl.addEventListener("submit", viewHighScores);
-}
-
-function viewHighScores (e) { 
-  e.preventDefault();
-    var name = document.querySelector("#initails-input").value;
-    savedInit(name);
-
-    //scorePageEl.replaceWith(highScoreEl)
-    loadSaveScores();
-    
   
+
+    inNameEl.addEventListener("submit", saveScoresLocalStorage);
+    
 }
 
 
@@ -205,24 +198,54 @@ var savedScore = function() {
 var savedInit = function(initails) {
     localStorage.setItem("initails", JSON.stringify(initails));
 }
+//show questions 
+// var showQAs = function (){}
+function showQAs (){
+    questionEl.innerHTML=questions[questionIndex].question
+   // loop for answers in questions
+    //answerEl.innerHTML = "<ol>";
+    
+    for (var i = 0; i< questions[questionIndex].answers.length; i++) {
+       answerButton(questions[questionIndex].answers[i]); 
+    }    
 
-// gets tasks from local storage and load them
-function loadSaveScores() {
-    // get tasks items from local stroage
-    var savedScore = localStorage.getItem("score");
-    var savedInit = localStorage.getItem("initails");
+    //answerEl.innerHTML += "</ol>";
+}
 
-    savedScore  = JSON.parse(savedScore);
-    savedInit = JSON.parse(savedInit);
+// game over function
+//var gameOver = function (){}
+function gameOver() {
+    clearInterval(runningTimer);
+    countdownEl.innerHTML = "Finished";
+    displayScore();
+    //savedScore ();
+}
 
-    document.getElementById("highScores").innerHTML = savedInit + " - " + savedScore;
-   
-}   
+//looping through questionIndex
+//var nextQuestion = function (){}
+function nextQuestion (event) {
+    console.log(nextQuestion);
+    var targetEl = event.target;
+    
+    correctInc(targetEl.getAttribute('answer'));
 
-/*function submitScores (e) {
-    e.preventDefault();
+    deleteButton();
+    questionIndex++;
+    if (questionIndex < questions.length) {
+        showQAs();
+    } else {
+        gameOver();
+    }
+}
 
-}*/
+// start quiz on click  
+//ar startQuiz = fucntion () {
+    
+function startQuiz() {
+    startPageEl.replaceWith(questionConEl)
+    startTimer();
+    showQAs();
+}
 
 
 //event listeners
