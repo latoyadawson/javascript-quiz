@@ -15,7 +15,7 @@ This is a simple web page that is a point and click to navigate in browser. The 
 ![screenshot of QA](/assets/images/Q&A.png)
 
 ## Website
-https://latoyadawson.github.io/password-generator/
+https://latoyadawson.github.io/javascript-quiz/
 
 ## Contribution
 Made with ❤️  by Latoya Dawson
