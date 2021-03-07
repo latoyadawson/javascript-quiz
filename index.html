@@ -11,14 +11,14 @@
 <body>
     <div class="layout-container">
         <header>
-            <h1 onclick="viewHighScores();">View High Scores</h1>
+            <!--<h1 onclick="viewHighScores();">View High Scores</h1>-->
             <h1 id="countdown" class="countdown"></h1>
         </header>
         <main>
             <div id="startpage" class="startpage">
                 <h2>Coding Quiz Challenge</h2>
-                <p>Try to answer the following code related questions within within the time limit. <br>
-                    Keep in mind that incorrect answers will penalize your score and time by ten seconds!
+                <p>Try to answer the following JavaScript code related questions within the time limit. <br>
+                    Keep in mind that incorrect answers will penalize your time by ten seconds and each question is worth 5 points!
                 </p>
                 <button class="btn" id="start" type="submit">Start Quiz</button>
             </div>
@@ -34,9 +34,7 @@
                 <form id="inName" class="in-name"></form>
                 <div id="saveButton" class="save-button"></div>
             </div>
-            <div id ="highScores" class="high-scores">
-                <div id="high-score-title"></div>
-            </div>
+            <div id ="highScores" class="high-scores"></div>
 
         </main>
     </div>

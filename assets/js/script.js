@@ -17,15 +17,16 @@ var timer = 75;
 var runningTimer;
 var score = 0;
 var questionIndex = 0
+var restartButton;
 
 //questions array
 var questions = [
     {question:"String values must be enclosed within _____ when being assigned to variables.",
     answers: [
         {text: "commas", correct:false },
-        {text: "culry brackets", correct:false},
-        {text: "quotes", correct:false },
-        {text: "parenthsis", correct:true }
+        {text: "curly brackets", correct:false},
+        {text: "quotes", correct:true},
+        {text: "parenthsis", correct:false }
     ]
     },
     {question:"Array's in JavaScript can be used to store _____.",
@@ -44,7 +45,7 @@ var questions = [
         {text: "foor loops", correct:false }
     ]
     },
-    {question:"Commonly used data types DO not include:",
+    {question:"Commonly used data types DO NOT include:",
     answers: [
         {text: "strings", correct:false },
         {text: "booleans", correct:false},
@@ -87,7 +88,6 @@ function deleteButton (){
 }
 
 //adjusting time and points based on if answer is correct or wrong 
-//var correctInc = function (answer){}
 function correctInc (answer) {
     createText(answer);
     if (answer === "true"){
@@ -98,7 +98,6 @@ function correctInc (answer) {
 }
 
 //function for creating a text for correct and wrong answer's
-//var createText = function(answer){}
 function createText(answer) {
     if (answer === "true") {
         correctEl.innerHTML = "Correct!"
@@ -108,11 +107,11 @@ function createText(answer) {
 }
 
 // timer function starts at 75 seconds
-//var startTimer = function ()
 function startTimer() {
     countdownEl.innerHTML = "Time:" + timer;
     if (timer <= 0) {
         gameOver();
+        //alert("Gamve Over!");
     } else {
         timer -= 1;
         runningTimer = setTimeout(startTimer, 1000);
@@ -120,13 +119,16 @@ function startTimer() {
 
 }
 
-
 // gets items from local storage and load them
-//var loadSavedScores = function (){}
 function loadSavedScores() {
+    var highScoreTitle = document.createElement("h1")
+    highScoreTitle.innerHTML = "Scores";
+    highScoreTitle.setAttribute("class" , "high-score-title");
 
+    highScoreEl.appendChild(highScoreTitle);
+
+    // saving items from local storage to variable
     var currentleaderboard = JSON.parse(localStorage.getItem("leaderboard"));
-   
 
     //loop through the leaderboard create new DOM elements
     for (var i = 0; i<currentleaderboard.length; i++) {
@@ -136,21 +138,48 @@ function loadSavedScores() {
         highScoreEl.appendChild(p);
     }
 
-   
-}   
+    var restartButton = document.createElement("button");
+    restartButton.setAttribute("id" , "restarButton");
+    restartButton.setAttribute("class", "restart-button");
+    restartButton.innerHTML = "Restart Quiz"
+
+
+    //restartButton.addEventListener("click", reload());
+
+    highScoreEl.appendChild(restartButton);
+    
+    restartButton.addEventListener("click", reload);
+}  
+
+
+function reload(){
+   location.reload();
+}
 
 function viewHighScores() { 
     scorePageEl.replaceWith(highScoreEl);
     loadSavedScores();
+    
 }
   
   
 //save name and initail to local stroage 
-// var saveScoresLocalstorage = function (){}
 function saveScoresLocalStorage(e) {
     e.preventDefault();
     var name = document.querySelector("#initails-input").value;
+   
+    // if statment if the initails value is empty
+    if (name === '') {
+        alert("Input Initials!");
+        return;
+    }
+
+    // on save conver intiails to uppcase
+    name = name.toUpperCase();
+
+    // save the score and initails together
     var userScore = {initails: name , score};
+
     // get the current local storage array
     var leaderboard = JSON.parse(localStorage.getItem("leaderboard")) || [];
     // push userscore variables into leaderboard array 
@@ -161,7 +190,6 @@ function saveScoresLocalStorage(e) {
 }
 
 // once all questions have been answered give me a final score 
-//var displayScore = function () {}
 function displayScore() {
     questionConEl.replaceWith(scorePageEl);
     scoreAreaEl.innerText = "Final Score: " + score;
@@ -171,7 +199,8 @@ function displayScore() {
     initTextEl.setAttribute("class","initails-input");
     initTextEl.setAttribute("type", "text"); 
     initTextEl.setAttribute("name", "iniatials"); 
-    initTextEl.setAttribute("placeholder", "Enter Initials here"); 
+    initTextEl.setAttribute("maxlength" , "3");
+    initTextEl.setAttribute("placeholder", "Enter Initials Here"); 
       
     inNameEl.appendChild(initTextEl);
 
@@ -199,48 +228,38 @@ var savedInit = function(initails) {
     localStorage.setItem("initails", JSON.stringify(initails));
 }
 //show questions 
-// var showQAs = function (){}
 function showQAs (){
     questionEl.innerHTML=questions[questionIndex].question
    // loop for answers in questions
-    //answerEl.innerHTML = "<ol>";
-    
     for (var i = 0; i< questions[questionIndex].answers.length; i++) {
        answerButton(questions[questionIndex].answers[i]); 
-    }    
-
-    //answerEl.innerHTML += "</ol>";
+    } 
 }
 
 // game over function
-//var gameOver = function (){}
 function gameOver() {
     clearInterval(runningTimer);
     countdownEl.innerHTML = "Finished";
     displayScore();
-    //savedScore ();
 }
 
 //looping through questionIndex
-//var nextQuestion = function (){}
 function nextQuestion (event) {
-    console.log(nextQuestion);
     var targetEl = event.target;
     
     correctInc(targetEl.getAttribute('answer'));
-
+    
     deleteButton();
     questionIndex++;
     if (questionIndex < questions.length) {
         showQAs();
     } else {
         gameOver();
+        //alert("Gamve Over!");  
     }
 }
 
-// start quiz on click  
-//ar startQuiz = fucntion () {
-    
+// start quiz on click  and call timer and show go through questions    
 function startQuiz() {
     startPageEl.replaceWith(questionConEl)
     startTimer();
@@ -249,4 +268,5 @@ function startQuiz() {
 
 
 //event listeners
+
 startButtonEl.addEventListener("click", startQuiz);
